@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>jRow - test</title>
+<link rel="stylesheet" type="text/css" href="css/jRowStyle.css">
+<script src="jRow.js"></script>
+<script>
+	console.log('current version :',jRow.version);
+	
+	var myTable = jRow.createTable('myTableTitle', [ 'name', 'surname',
+			'address' ]);
+	myTable.insert({
+		name : 'John',
+		surname : 'Smith',
+		address : 'avenue street'
+	}).insert({
+		name : 'John',
+		surname : 'Red',
+		address : 'park avenue'
+	}).insert({
+		name:'Paul',
+		surname:'John',
+		address:'celebrity street'
+	});
+
+	var result = myTable.getResult({
+		name : 'John',
+		surname : 'Smith'
+	});
+	for (n in result) {
+		var row = result[n];
+		console.log(row.address);
+	}
+
+	//myTable.update({name:'Jack',surname:'Black',address:'awesome street'},{_id:0});
+	console.log(myTable.getFirstRow({
+		name : 'John'
+	}).address);
+
+	/*myTable.erase({
+		name : 'John'
+	});*/
+	console.log(myTable.getResult());
+	
+	jRow.UI.prepare();
+	jRow.UI.link('myTable',myTable);
+</script>
+</head>
+<body>
+	<div id="myTable"></div>
+</body>
+</html>

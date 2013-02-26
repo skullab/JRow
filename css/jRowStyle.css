@@ -1,0 +1,99 @@
+div.ui_table_title {
+	width:100%;
+	border-collapse: collapse;
+	background-color: #435a60;
+	background: -webkit-gradient(linear, left top, left bottom, from(#283639),
+		to(#435a60) );
+	color: #dadada;
+	text-transform: uppercase;
+	padding-top: 0.4em;
+	padding-bottom: 0.4em;
+	text-align: left;
+}
+/*** sample table to demonstrate CSS3 formatting ***/
+table.ui_table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	color: #606060;
+}
+
+/*** table's thead section, head row style ***/
+table.ui_table thead tr td {
+	background-color: White;
+	vertical-align: middle;
+	padding: 0.6em;
+	font-size: 0.8em;
+}
+
+/*** table's thead section, coulmns header style ***/
+table.ui_table thead tr th {
+	padding: 0.5em;
+	/* add gradient */
+	background-color: #808080;
+	background: -webkit-gradient(linear, left top, left bottom, from(#606060),
+		to(#909090) );
+	background: -moz-linear-gradient(top, #606060, #909090);
+	color: #dadada;
+	text-transform: uppercase;
+	text-align:left;
+}
+
+/*** table's tbody section, odd rows style ***/
+table.ui_table tbody tr:nth-child(odd) {
+	background-color: #d9dedf;
+}
+
+/*** hover effect to table's tbody odd rows ***/
+table.ui_table tbody tr:nth-child(odd):hover {
+	cursor: pointer;
+	/* add gradient */
+	background-color: #808080;
+	background: -webkit-gradient(linear, left top, left bottom, from(#606060),
+		to(#909090) );
+	background: -moz-linear-gradient(top, #606060, #909090);
+	color: #dadada;
+}
+
+/*** table's tbody section, even rows style ***/
+table.ui_table tbody tr:nth-child(even) {
+	background-color: #dee2e3;
+}
+
+/*** hover effect to apply to table's tbody section, even rows ***/
+table.ui_table tbody tr:nth-child(even):hover {
+	cursor: pointer;
+	/* add gradient */
+	background-color: #808080;
+	background: -webkit-gradient(linear, left top, left bottom, from(#606060),
+		to(#909090) );
+	background: -moz-linear-gradient(top, #606060, #909090);
+	color: #dadada;
+}
+
+/*** table's tbody section, last row style ***/
+table.ui_table tbody tr:last-child {
+	border-bottom: solid 1px #404040;
+}
+
+/*** table's tbody section, separator row pseudo-class ***/
+table.ui_table tbody tr.separator { /* add gradient */
+	background-color: #808080;
+	background: -webkit-gradient(linear, left top, left bottom, from(#606060),
+		to(#909090) );
+	background: -moz-linear-gradient(top, #606060, #909090);
+	color: #dadada;
+}
+
+/*** table's td element, all section ***/
+table.ui_table td {
+	vertical-align: middle;
+	padding: 0.5em;
+}
+
+/*** table's tfoot section ***/
+table.ui_table tfoot {
+	text-align: center;
+	color: #303030;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+}
