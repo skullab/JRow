@@ -1,5 +1,8 @@
 /*
  *	jRow.js Copyright (C) 2013 Ivan Maruca (ivan.maruca[at]gmail[dot]com)
+ *	http://skullab.com
+ *
+ *	jRow.js is released under MIT LICENSE
  *
  *	Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  *	and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -15,7 +18,7 @@
  *	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
  *	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
  *	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *			        ____                          
+ *					____                          
  *				 __/\  _`\                        
  *				/\_\ \ \L\ \    ___   __  __  __  
  *				\/\ \ \ ,  /   / __`\/\ \/\ \/\ \ 
@@ -28,6 +31,7 @@
  *	T H E   J A V A S C R I P T   D A T A   S T R U C T U R E 
  */
 
+if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 (function(context) {
 /* +----------------------------------------------------------------------------+
  * |							CONSTANTS										|
@@ -38,7 +42,7 @@
 	// SOFTWARE VERSIONING
 	var VER_MAJOR = 0 ;
 	var VER_MINOR = 1 ;
-	var VER_REVISION = 1 ;
+	var VER_REVISION = 2 ;
 	
 	var NOT_ASSIGNED = 'not_assigned';
 	
@@ -50,7 +54,7 @@
 */
 	
 	context.jRow = {
-		// current version of this software x.y [major.minor.revision]
+		// current version of this software [major.minor.revision]
 		version : VER_MAJOR + '.' + VER_MINOR + '.' + VER_REVISION,
 		// the root where it is installed
 		root:''
@@ -186,8 +190,14 @@
 	}
 	
 	context.jRow.UI.links = {} ;
+	context.jRow.UI.layouts = {} ;
 	context.jRow.UI.tables = {} ;
 	
+	context.jRow.UI.CSS_FILENAME = 'jRowStyle' ;
+	context.jRow.UI.CSS_TITLE = 'jrow_stylesheet' ;
+	context.jRow.UI.WIDTH = 'width' ;
+	context.jRow.UI.HEIGHT = 'height' ;
+	context.jRow.UI.LIMIT = 'limit' ;
 /* +----------------------------------------------------------------------------+
  * |						USER INTERFACE CORE									|
  * +----------------------------------------------------------------------------+
@@ -195,6 +205,15 @@
  * +----------------------------------------------------------------------------+
 */
 	function prepare(){
+		
+		var css = document.createElement('link');
+		css.rel = 'stylesheet' ;
+		css.type = 'text/css' ;
+		css.href = './css/' + context.jRow.UI.CSS_FILENAME + '.css' ;
+		css.title = context.jRow.UI.CSS_TITLE ;
+		
+		document.getElementsByTagName('head')[0].appendChild(css);
+		
 		if(window.addEventListener){
 			window.addEventListener('load',invalidate,false);
 		}else if(window.attachEvent){
@@ -204,19 +223,64 @@
 	
 	function invalidate(){
 		console.log('It\'s time to create UI !');
-		for(id in context.jRow.UI.links){
+		for(var id in context.jRow.UI.links){
 			var div = document.getElementById(id);
 			var table = context.jRow.UI.links[id] ;
 			context.jRow.UI.tables[table.title] = new UiTable(div,table);
 			context.jRow.UI.tables[table.title].draw();
+			context.jRow.UI.tables[table.title].configure();
 		}
 	}
 	
-	function link(divId,table){
+	function link(divId,table,settings){
 		if(table instanceof Table){
 			console.log('the table',table.title,'is instance of Table');
 			context.jRow.UI.links[divId] = table ;
+			if(settings != null && typeof settings == 'object'){
+				context.jRow.UI.layouts[divId] = settings ;
+			}
 		}
+	}
+	
+	function configure(){
+		var id = this.div.getAttribute('id');
+		var settings = context.jRow.UI.layouts[id];
+		var tableElement = document.getElementById(id+'_table');	
+		
+		for(var i = 0 ; i < this.table.cols ; i++){
+			if( 'col'+i in settings){
+				var id = this.table.title + '_col_' + i ;
+				var col = document.getElementById(id);
+				console.log(col);
+				col.style.width = settings['col'+i] ;
+			}
+			
+		}
+		
+		for(var option in settings){
+			switch(option){
+			case 'width':
+				this.div.style.width = settings[option] ;
+				//tableElement.style.width = settings[option];
+				break;
+			case 'height':
+				break;
+			}
+		}
+	}
+	
+	function getStyle(el, rule){
+		var value = "";
+		if(document.defaultView && document.defaultView.getComputedStyle){
+			value = document.defaultView.getComputedStyle(el, "").getPropertyValue(rule);
+		}
+		else if(el.currentStyle){
+			rule = rule.replace(/\-(\w)/g, function (match, p1){
+				return p1.toUpperCase();
+			});
+			value = el.currentStyle[rule];
+		}
+		return value;
 	}
 	
 	function UiTable(div,table){
@@ -225,7 +289,8 @@
 	}
 	
 	UiTable.prototype = {
-		constructor:UiTable
+		constructor:UiTable,
+		configure:configure
 	}
 	
 	UiTable.prototype.draw = function(){
@@ -234,7 +299,8 @@
 		var nl = '\n' ;
 		var html = 
 			'<div class="ui_table_title"> ' + this.table.title + ' </div>' + nl +
-			'<table class="ui_table">' + nl + 
+			'<table id="'+this.div.getAttribute('id')+'_table" class="ui_table">' + nl +
+			'	{colgroup}' + nl +
 			'	<thead>' + nl + 
 			'		{thead_content}' + nl + 
 			'	</thead>' + nl +
@@ -245,15 +311,23 @@
 			'		<tr><td colspan="' + this.table.cols + '">{tfoot_content}</td></tr>' + nl +
 			'	</tfoot>';
 		
+		var colgroup = '' ;
 		var thead = '<tr>' ;
 		var tbody = '' ;
 		var tfoot = 'powered by jRow.js (c) 2013' ;
 		
+		// COLGROUP
+		for(var i = 0 ; i < this.table.cols ; i++){
+			var col = '<col id="'+this.table.title+'_col_'+i+'">' ;
+			colgroup += col + nl;
+		}
+		// THEAD
 		for(var i in this.table.header){
 			thead += '<th>' + this.table.header[i] + '</th>' ;
 		}
 		thead += '</tr>' ;
 		
+		// TBODY
 		for(var n in this.table.collections){
 			var row = this.table.collections[n] ;
 			tbody += '<tr>' ;
@@ -265,6 +339,7 @@
 			tbody += '</tr>' ;
 		}
 		
+		html = html.replace('{colgroup}',colgroup);
 		html = html.replace('{thead_content}',thead);
 		html = html.replace('{tbody_content}',tbody);
 		html = html.replace('{tfoot_content}',tfoot);
@@ -272,4 +347,4 @@
 		this.div.innerHTML = html ;
 	}
 	
-})(this);
+})(JROW_CONTEXT);

@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <title>jRow - test</title>
-<link rel="stylesheet" type="text/css" href="css/jRowStyle.css">
 <script src="jRow.js"></script>
 <script>
 	console.log('current version :',jRow.version);
@@ -44,7 +43,7 @@
 	console.log(myTable.getResult());
 	
 	jRow.UI.prepare();
-	jRow.UI.link('myTable',myTable);
+	jRow.UI.link('myTable',myTable,{col0:'10%',col1:'10%',col2:'80%',width:'50%'});
 </script>
 </head>
 <body>
