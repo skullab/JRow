@@ -42,7 +42,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	// SOFTWARE VERSIONING
 	var VER_MAJOR = 0 ;
 	var VER_MINOR = 1 ;
-	var VER_REVISION = 2 ;
+	var VER_REVISION = 3 ;
 	
 	var NOT_ASSIGNED = 'not_assigned';
 	
@@ -186,7 +186,9 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	context.jRow.UI = {
 			link:link,
 			prepare:prepare,
-			invalidate:invalidate
+			invalidate:invalidate,
+			collapseTable:collapseTable,
+			expandTable:expandTable
 	}
 	
 	context.jRow.UI.links = {} ;
@@ -198,6 +200,9 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	context.jRow.UI.WIDTH = 'width' ;
 	context.jRow.UI.HEIGHT = 'height' ;
 	context.jRow.UI.LIMIT = 'limit' ;
+	context.jRow.UI.ARROW_COLLAPSE = 'arrow_collapse.png' ;
+	context.jRow.UI.ARROW_EXPAND = 'arrow_expand.png' ;
+	
 /* +----------------------------------------------------------------------------+
  * |						USER INTERFACE CORE									|
  * +----------------------------------------------------------------------------+
@@ -221,8 +226,15 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		}else throw new Error('ERROR : sorry but I can\'t prepare the user interface...\n try to add elements after enviroment is completely loaded');
 	}
 	
-	function invalidate(){
+	function invalidate(reference){
 		console.log('It\'s time to create UI !');
+		
+		if(reference instanceof context.jRow.Table){
+			context.jRow.UI.tables[reference.title].draw();
+			context.jRow.UI.tables[reference.title].configure();
+			return ;
+		}
+		
 		for(var id in context.jRow.UI.links){
 			var div = document.getElementById(id);
 			var table = context.jRow.UI.links[id] ;
@@ -240,6 +252,14 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 				context.jRow.UI.layouts[divId] = settings ;
 			}
 		}
+	}
+	
+	function collapseTable(table){
+		
+	}
+	
+	function expandTable(table){
+		
 	}
 	
 	function configure(){
@@ -264,6 +284,12 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 				//tableElement.style.width = settings[option];
 				break;
 			case 'height':
+				this.div.style.height = settings[option] ;
+				break;
+			case 'onRowClick':
+				if(typeof settings[option] == 'function'){
+					this.onRowClick = settings[option] ;
+				}
 				break;
 			}
 		}
@@ -298,8 +324,10 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		var br = '<br>\n' ;
 		var nl = '\n' ;
 		var html = 
-			'<div class="ui_table_title"> ' + this.table.title + ' </div>' + nl +
-			'<table id="'+this.div.getAttribute('id')+'_table" class="ui_table">' + nl +
+			'<div class="ui_table_title"> <img id="' + this.div.getAttribute('id') + '_arrow" src="./images/' + 
+			context.jRow.UI.ARROW_COLLAPSE + '" style="vertical-align:middle;" > ' + this.table.title + 
+			'<img src="./images/jrow_title_ad.png" align="right"></div>' + nl +
+			'<table id="'+this.div.getAttribute('id')+'_table" class="ui_table" collapsed="true">' + nl +
 			'	{colgroup}' + nl +
 			'	<thead>' + nl + 
 			'		{thead_content}' + nl + 
@@ -330,7 +358,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		// TBODY
 		for(var n in this.table.collections){
 			var row = this.table.collections[n] ;
-			tbody += '<tr>' ;
+			tbody += '<tr id="' + this.div.getAttribute('id') + '_table_row_' + n + '">' ;
 			for(var value in row){
 				if(value != '_id'){
 					tbody += '<td>' + row[value] + '</td>' ;
@@ -345,6 +373,35 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		html = html.replace('{tfoot_content}',tfoot);
 		
 		this.div.innerHTML = html ;
+		
+		var id = this.div.getAttribute('id') ;
+		var _this = this ;
+		
+		for(var n in this.table.collections){
+			var r = document.getElementById(id+'_table_row_'+n);
+			r.setAttribute('ID',n);
+			r.onclick = function(){
+				var id = this.getAttribute('ID') ;
+				var result = _this.table.getResult({_id:id});
+				_this.onRowClick(result[0]);
+			}
+		}
+		
+		var arrow = document.getElementById(id+'_arrow');
+		var table = document.getElementById(id+'_table');
+		arrow.onclick = function(){
+			var collapsed = table.getAttribute('collapsed');
+			if(collapsed){
+				this.src = './images/' + context.jRow.UI.ARROW_EXPAND ;
+				table.style.display = 'none' ;
+				table.setAttribute('collapsed','');
+				
+			}else{
+				this.src = './images/' + context.jRow.UI.ARROW_COLLAPSE ;
+				table.style.display = 'block' ;
+				table.setAttribute('collapsed','true');
+			}
+		}
 	}
 	
 })(JROW_CONTEXT);

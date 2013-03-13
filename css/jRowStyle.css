@@ -5,10 +5,12 @@ div.ui_table_title {
 	background: -webkit-gradient(linear, left top, left bottom, from(#283639),
 		to(#435a60) );
 	color: #dadada;
-	text-transform: uppercase;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
+	text-transform: uppercase;
 	text-align: left;
+	text-indent: 5px;
+	font-size: 0.9em;
 }
 /*** sample table to demonstrate CSS3 formatting ***/
 table.ui_table {
