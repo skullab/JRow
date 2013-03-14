@@ -18,7 +18,7 @@
  *	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
  *	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
  *	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *					____                          
+ *					   ____                          
  *				 __/\  _`\                        
  *				/\_\ \ \L\ \    ___   __  __  __  
  *				\/\ \ \ ,  /   / __`\/\ \/\ \/\ \ 
@@ -222,7 +222,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		if(window.addEventListener){
 			window.addEventListener('load',invalidate,false);
 		}else if(window.attachEvent){
-			return window.addEventListener('onload',invalidate);
+			return window.attachEvent('onload',invalidate);
 		}else throw new Error('ERROR : sorry but I can\'t prepare the user interface...\n try to add elements after enviroment is completely loaded');
 	}
 	
