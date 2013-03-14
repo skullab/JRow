@@ -41,10 +41,19 @@
 	console.log(myTable.getResult());
 	
 	
-	jRow.UI.link('myTable',myTable,{col0:'10%',col1:'10%',col2:'80%',width:'50%',onRowClick:function(row){
-		myTable.update({name:'Mike'},{_id:row._id});
-		jRow.UI.invalidate(myTable);
-	}});
+	jRow.UI.link('myTable',myTable,{
+    col0:'25%',
+    col1:'25%',
+    col2:'50%',
+    width:'80%',
+    collapsed:true,
+    onRowClick:function(row){
+		  //myTable.update({name:'Mike'},{_id:row._id});
+      //myTable.erase({_id:row._id});
+      this.showContextMenu();
+		  jRow.UI.invalidate(myTable);
+	  }
+  });
 	
 	jRow.UI.prepare();
 </script>

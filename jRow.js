@@ -186,9 +186,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	context.jRow.UI = {
 			link:link,
 			prepare:prepare,
-			invalidate:invalidate,
-			collapseTable:collapseTable,
-			expandTable:expandTable
+			invalidate:invalidate
 	}
 	
 	context.jRow.UI.links = {} ;
@@ -253,15 +251,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 			}
 		}
 	}
-	
-	function collapseTable(table){
-		
-	}
-	
-	function expandTable(table){
-		
-	}
-	
+  
 	function configure(){
 		var id = this.div.getAttribute('id');
 		var settings = context.jRow.UI.layouts[id];
@@ -291,6 +281,12 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 					this.onRowClick = settings[option] ;
 				}
 				break;
+      case 'collapsed':
+        if(!settings[option]){
+          var arrow = document.getElementById(this.div.getAttribute('id')+'_arrow');
+          arrow.onclick();
+        }
+        break;
 			}
 		}
 	}
@@ -308,7 +304,13 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		}
 		return value;
 	}
-	
+  
+	function contextMenu(){
+    var id = this.div.getAttribute('id');
+    var menu = document.getElementById(id+'_context_menu');
+    menu.style.display = 'block' ;    
+  }
+  
 	function UiTable(div,table){
 		this.div = div ;
 		this.table = table ;
@@ -316,7 +318,8 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	
 	UiTable.prototype = {
 		constructor:UiTable,
-		configure:configure
+		configure:configure,
+    showContextMenu:contextMenu
 	}
 	
 	UiTable.prototype.draw = function(){
@@ -337,7 +340,14 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 			'	</tbody>' + nl +
 			'	<tfoot>' + nl +
 			'		<tr><td colspan="' + this.table.cols + '">{tfoot_content}</td></tr>' + nl +
-			'	</tfoot>';
+			'	</tfoot>' + nl +
+      ' <div id="' + this.div.getAttribute('id') + '_context_menu" class="ui_context_menu">' + nl +
+      ' <ul class="menu">' + nl +
+      '   <li>Option 1</li>' + nl + 
+      '   <li>Option 2</li>' + nl +
+      '   <li>Option 3</li>' + nl +
+      ' </ul>' + nl +
+      ' </div>';
 		
 		var colgroup = '' ;
 		var thead = '<tr>' ;
@@ -398,7 +408,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 				
 			}else{
 				this.src = './images/' + context.jRow.UI.ARROW_COLLAPSE ;
-				table.style.display = 'block' ;
+				table.style.display = 'table' ;
 				table.setAttribute('collapsed','true');
 			}
 		}
