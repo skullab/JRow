@@ -18,7 +18,7 @@
  *	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
  *	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
  *	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *					   ____                          
+ *					 ____                          
  *				 __/\  _`\                        
  *				/\_\ \ \L\ \    ___   __  __  __  
  *				\/\ \ \ ,  /   / __`\/\ \/\ \/\ \ 
@@ -31,33 +31,37 @@
  *	T H E   J A V A S C R I P T   D A T A   S T R U C T U R E 
  */
 
-if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
+if (typeof JROW_CONTEXT === 'undefined') {
+	JROW_CONTEXT = (this.window || this);
+};
 (function(context) {
-/* +----------------------------------------------------------------------------+
- * |							CONSTANTS										|
- * +----------------------------------------------------------------------------+
- * |	ACCESSIBILITY : PRIVATE													|
- * +----------------------------------------------------------------------------+
-*/
+	/*
+	 * +----------------------------------------------------------------------------+ |
+	 * CONSTANTS |
+	 * +----------------------------------------------------------------------------+ |
+	 * ACCESSIBILITY : PRIVATE |
+	 * +----------------------------------------------------------------------------+
+	 */
 	// SOFTWARE VERSIONING
-	var VER_MAJOR = 0 ;
-	var VER_MINOR = 1 ;
-	var VER_REVISION = 3 ;
-	
+	var VER_MAJOR = 0;
+	var VER_MINOR = 1;
+	var VER_REVISION = 3;
+
 	var NOT_ASSIGNED = 'not_assigned';
-	
-/* +----------------------------------------------------------------------------+
- * |							JROW MODULE										|
- * +----------------------------------------------------------------------------+
- * |	ACCESSIBILITY : PUBLIC													|
- * +----------------------------------------------------------------------------+
-*/
-	
+
+	/*
+	 * +----------------------------------------------------------------------------+ |
+	 * JROW MODULE |
+	 * +----------------------------------------------------------------------------+ |
+	 * ACCESSIBILITY : PUBLIC |
+	 * +----------------------------------------------------------------------------+
+	 */
+
 	context.jRow = {
 		// current version of this software [major.minor.revision]
 		version : VER_MAJOR + '.' + VER_MINOR + '.' + VER_REVISION,
 		// the root where it is installed
-		root:''
+		root : ''
 	}
 
 	context.jRow.createTable = createTable;
@@ -72,13 +76,14 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		exportable : NOT_ASSIGNED
 	// TODO feature !
 	}
-	
-/* +----------------------------------------------------------------------------+
- * |								CORE										|
- * +----------------------------------------------------------------------------+
- * |	ACCESSIBILITY : PRIVATE													|
- * +----------------------------------------------------------------------------+
-*/
+
+	/*
+	 * +----------------------------------------------------------------------------+ |
+	 * CORE |
+	 * +----------------------------------------------------------------------------+ |
+	 * ACCESSIBILITY : PRIVATE |
+	 * +----------------------------------------------------------------------------+
+	 */
 
 	// Main Table function
 	function Table(title, header) {
@@ -91,7 +96,7 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 		this.cols = header.length;
 		this.rows = 0;
 		this._id = -1;
-		this.collections = {} ;
+		this.collections = {};
 
 		for (key in header) {
 			// console.log(header[key]);
@@ -119,20 +124,20 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 			}
 		},
 		erase : function(where) {
-			var result = this.getResult(where) ;
-			for(n in result){
-				var row = result[n] ;
-				delete this.collections[row._id] ;
+			var result = this.getResult(where);
+			for (n in result) {
+				var row = result[n];
+				delete this.collections[row._id];
 			}
 		},
 		getResult : function(where) {
 			var result = new Array();
 			var check = false;
-			
-			if(where == null){
-				result = this.collections ;
+
+			if (where == null) {
+				result = this.collections;
 			}
-			
+
 			for (n in this.collections) {
 				// console.log(this.collections[n]);
 				var collection = this.collections[n];
@@ -176,242 +181,328 @@ if(typeof JROW_CONTEXT === 'undefined'){JROW_CONTEXT = (this.window || this) ;};
 	function isArray(obj) {
 		return obj.constructor == Array;
 	}
-	
-/* +----------------------------------------------------------------------------+
- * |							USER INTERFACE									|
- * +----------------------------------------------------------------------------+
- * |	ACCESSIBILITY : PUBLIC													|
- * +----------------------------------------------------------------------------+
- */
+
+	/*
+	 * +----------------------------------------------------------------------------+ |
+	 * USER INTERFACE |
+	 * +----------------------------------------------------------------------------+ |
+	 * ACCESSIBILITY : PUBLIC |
+	 * +----------------------------------------------------------------------------+
+	 */
 	context.jRow.UI = {
-			link:link,
-			prepare:prepare,
-			invalidate:invalidate
+		link : link,
+		prepare : prepare,
+		invalidate : invalidate
 	}
-	
-	context.jRow.UI.links = {} ;
-	context.jRow.UI.layouts = {} ;
-	context.jRow.UI.tables = {} ;
-	
-	context.jRow.UI.CSS_FILENAME = 'jRowStyle' ;
-	context.jRow.UI.CSS_TITLE = 'jrow_stylesheet' ;
-	context.jRow.UI.WIDTH = 'width' ;
-	context.jRow.UI.HEIGHT = 'height' ;
-	context.jRow.UI.LIMIT = 'limit' ;
-	context.jRow.UI.ARROW_COLLAPSE = 'arrow_collapse.png' ;
-	context.jRow.UI.ARROW_EXPAND = 'arrow_expand.png' ;
-	
-/* +----------------------------------------------------------------------------+
- * |						USER INTERFACE CORE									|
- * +----------------------------------------------------------------------------+
- * |	ACCESSIBILITY : PRIVATE													|
- * +----------------------------------------------------------------------------+
-*/
-	function prepare(){
-		
+
+	context.jRow.UI.links = {};
+	context.jRow.UI.layouts = {};
+	context.jRow.UI.tables = {};
+
+	context.jRow.UI.CSS_FILENAME = 'jRowStyle';
+	context.jRow.UI.CSS_TITLE = 'jrow_stylesheet';
+	context.jRow.UI.WIDTH = 'width';
+	context.jRow.UI.HEIGHT = 'height';
+	context.jRow.UI.LIMIT = 'limit';
+	context.jRow.UI.ARROW_COLLAPSE = 'arrow_collapse.png';
+	context.jRow.UI.ARROW_EXPAND = 'arrow_expand.png';
+
+	/*
+	 * +----------------------------------------------------------------------------+ |
+	 * USER INTERFACE CORE |
+	 * +----------------------------------------------------------------------------+ |
+	 * ACCESSIBILITY : PRIVATE |
+	 * +----------------------------------------------------------------------------+
+	 */
+	function prepare() {
+
 		var css = document.createElement('link');
-		css.rel = 'stylesheet' ;
-		css.type = 'text/css' ;
-		css.href = './css/' + context.jRow.UI.CSS_FILENAME + '.css' ;
-		css.title = context.jRow.UI.CSS_TITLE ;
-		
+		css.rel = 'stylesheet';
+		css.type = 'text/css';
+		css.href = './css/' + context.jRow.UI.CSS_FILENAME + '.css';
+		css.title = context.jRow.UI.CSS_TITLE;
+
 		document.getElementsByTagName('head')[0].appendChild(css);
-		
-		if(window.addEventListener){
-			window.addEventListener('load',invalidate,false);
-		}else if(window.attachEvent){
-			return window.attachEvent('onload',invalidate);
-		}else throw new Error('ERROR : sorry but I can\'t prepare the user interface...\n try to add elements after enviroment is completely loaded');
+
+		if (window.addEventListener) {
+			window.addEventListener('load', invalidate, false);
+		} else if (window.attachEvent) {
+			return window.attachEvent('onload', invalidate);
+		} else
+			throw new Error(
+					'ERROR : sorry but I can\'t prepare the user interface...\n try to add elements after enviroment is completely loaded');
 	}
-	
-	function invalidate(reference){
-		console.log('It\'s time to create UI !');
-		
-		if(reference instanceof context.jRow.Table){
+
+	function invalidate(reference) {
+		//console.log('It\'s time to create UI !');
+
+		if (reference instanceof context.jRow.Table) {
 			context.jRow.UI.tables[reference.title].draw();
 			context.jRow.UI.tables[reference.title].configure();
-			return ;
+			return;
 		}
-		
-		for(var id in context.jRow.UI.links){
+
+		for ( var id in context.jRow.UI.links) {
 			var div = document.getElementById(id);
-			var table = context.jRow.UI.links[id] ;
-			context.jRow.UI.tables[table.title] = new UiTable(div,table);
+			var table = context.jRow.UI.links[id];
+			context.jRow.UI.tables[table.title] = new UiTable(div, table);
 			context.jRow.UI.tables[table.title].draw();
 			context.jRow.UI.tables[table.title].configure();
 		}
 	}
-	
-	function link(divId,table,settings){
-		if(table instanceof Table){
-			console.log('the table',table.title,'is instance of Table');
-			context.jRow.UI.links[divId] = table ;
-			if(settings != null && typeof settings == 'object'){
-				context.jRow.UI.layouts[divId] = settings ;
+
+	function link(divId, table, settings) {
+		if (table instanceof Table) {
+			//console.log('the table', table.title, 'is instance of Table');
+			context.jRow.UI.links[divId] = table;
+			if (settings != null && typeof settings == 'object') {
+				context.jRow.UI.layouts[divId] = settings;
 			}
 		}
 	}
-  
-	function configure(){
+
+	function configure() {
 		var id = this.div.getAttribute('id');
 		var settings = context.jRow.UI.layouts[id];
-		var tableElement = document.getElementById(id+'_table');	
+		var tableElement = document.getElementById(id + '_table');
+
+		if(!settings) return ;
 		
-		for(var i = 0 ; i < this.table.cols ; i++){
-			if( 'col'+i in settings){
-				var id = this.table.title + '_col_' + i ;
+		for ( var i = 0; i < this.table.cols; i++) {
+			if ('col' + i in settings) {
+				var id = this.table.title + '_col_' + i;
 				var col = document.getElementById(id);
-				console.log(col);
-				col.style.width = settings['col'+i] ;
+				//console.log(col);
+				col.style.width = settings['col' + i];
 			}
-			
+
 		}
-		
-		for(var option in settings){
-			switch(option){
+
+		for ( var option in settings) {
+			switch (option) {
 			case 'width':
-				this.div.style.width = settings[option] ;
-				//tableElement.style.width = settings[option];
+				this.div.style.width = settings[option];
+				// tableElement.style.width = settings[option];
 				break;
 			case 'height':
-				this.div.style.height = settings[option] ;
+				this.div.style.height = settings[option];
 				break;
 			case 'onRowClick':
-				if(typeof settings[option] == 'function'){
-					this.onRowClick = settings[option] ;
+				if (typeof settings[option] == 'function') {
+					this.onRowClick = settings[option];
 				}
 				break;
-      case 'collapsed':
-        if(!settings[option]){
-          var arrow = document.getElementById(this.div.getAttribute('id')+'_arrow');
-          arrow.onclick();
-        }
-        break;
+			case 'enableContextMenu':
+				this.enableContextMenu = settings[option] ;
+				break;
+			case 'onPrepareContextMenu':
+				if(typeof settings[option] == 'function'){
+					this.onPrepareContextMenu = settings[option] ;
+				}
+				break;
+			case 'onContextMenuItem':
+				if(typeof settings[option] == 'function'){
+					this.onContextMenuItem = settings[option] ;
+				}
+				break;
+			case 'collapsed':
+				if (!settings[option]) {
+					var arrow = document.getElementById(this.div
+							.getAttribute('id')
+							+ '_arrow');
+					arrow.onclick();
+				}
+				break;
 			}
 		}
 	}
-	
-	function getStyle(el, rule){
+
+	function getStyle(el, rule) {
 		var value = "";
-		if(document.defaultView && document.defaultView.getComputedStyle){
-			value = document.defaultView.getComputedStyle(el, "").getPropertyValue(rule);
-		}
-		else if(el.currentStyle){
-			rule = rule.replace(/\-(\w)/g, function (match, p1){
+		if (document.defaultView && document.defaultView.getComputedStyle) {
+			value = document.defaultView.getComputedStyle(el, "")
+					.getPropertyValue(rule);
+		} else if (el.currentStyle) {
+			rule = rule.replace(/\-(\w)/g, function(match, p1) {
 				return p1.toUpperCase();
 			});
 			value = el.currentStyle[rule];
 		}
 		return value;
 	}
-  
-	function contextMenu(){
-    var id = this.div.getAttribute('id');
-    var menu = document.getElementById(id+'_context_menu');
-    menu.style.display = 'block' ;    
-  }
-  
-	function UiTable(div,table){
-		this.div = div ;
-		this.table = table ;
+
+	function contextMenu(x,y,row) {
+		//console.log(x,y);
+		var id = this.div.getAttribute('id');
+		var container = document.getElementById(id);
+		var menu = document.getElementById(id + '_context_menu');
+		var line = document.getElementById(id + '_table_row_' + row._id);
+		
+		line.style.border = '2px solid #78aece' ;
+		
+		createContextMenuList(this,menu,row,this.onPrepareContextMenu());
+		
+		x = x - (container.offsetLeft) ;
+		y = y - (container.offsetTop) ;
+		
+		menu.style.left = x ? x+'px' : menu.style.left ;
+		menu.style.top = y ? y+'px' : menu.style.top ;
+		menu.style.display = 'block';
 	}
 	
+	function createContextMenuList(context,node,row,list){
+		// clenup !
+		while(node.firstChild){
+			node.removeChild(node.firstChild);
+		}
+		
+		for(var i in list){
+			var li = document.createElement('li');
+			var content = document.createTextNode(list[i]);
+			li.appendChild(content);
+			li.setAttribute('idItem',i);
+			li.onclick = function(){
+				var idItem = this.getAttribute('idItem');
+				if(context.onContextMenuItem){
+					context.onContextMenuItem(idItem,row);
+				}
+				node.style.display = 'none' ;
+			}
+			node.appendChild(li);
+		}
+		
+		node.onmouseover = function(){
+			//console.log('context menu mouse over');
+			clearTimeout(this.contextMenuTimeout);
+		}
+		
+		node.onmouseout = function(){
+			//console.log('context menu mouse out');
+			this.contextMenuTimeout = setTimeout(function(){
+				node.style.display = 'none' ;
+				var id = context.div.getAttribute('id');
+				var line = document.getElementById(id + '_table_row_' + row._id);
+				line.style.border = '' ;
+			},200);
+		}
+	}
+	
+	function UiTable(div, table) {
+		this.div = div;
+		this.table = table;
+	}
+
 	UiTable.prototype = {
-		constructor:UiTable,
-		configure:configure,
-    showContextMenu:contextMenu
+		constructor : UiTable,
+		configure : configure,
+		showContextMenu : contextMenu,
+		onPrepareContextMenu : function(){},
+		onContextMenuItem : function(){}
 	}
-	
-	UiTable.prototype.draw = function(){
-		console.log('Drawing table :',this.table.title);
-		var br = '<br>\n' ;
-		var nl = '\n' ;
-		var html = 
-			'<div class="ui_table_title"> <img id="' + this.div.getAttribute('id') + '_arrow" src="./images/' + 
-			context.jRow.UI.ARROW_COLLAPSE + '" style="vertical-align:middle;" > ' + this.table.title + 
-			'<img src="./images/jrow_title_ad.png" align="right"></div>' + nl +
-			'<table id="'+this.div.getAttribute('id')+'_table" class="ui_table" collapsed="true">' + nl +
-			'	{colgroup}' + nl +
-			'	<thead>' + nl + 
-			'		{thead_content}' + nl + 
-			'	</thead>' + nl +
-			'	<tbody>' + nl +
-			'		{tbody_content}' + nl +
-			'	</tbody>' + nl +
-			'	<tfoot>' + nl +
-			'		<tr><td colspan="' + this.table.cols + '">{tfoot_content}</td></tr>' + nl +
-			'	</tfoot>' + nl +
-      ' <div id="' + this.div.getAttribute('id') + '_context_menu" class="ui_context_menu">' + nl +
-      ' <ul class="menu">' + nl +
-      '   <li>Option 1</li>' + nl + 
-      '   <li>Option 2</li>' + nl +
-      '   <li>Option 3</li>' + nl +
-      ' </ul>' + nl +
-      ' </div>';
-		
-		var colgroup = '' ;
-		var thead = '<tr>' ;
-		var tbody = '' ;
-		var tfoot = 'powered by jRow.js (c) 2013' ;
-		
+
+	UiTable.prototype.draw = function() {
+		//console.log('Drawing table :', this.table.title);
+		var br = '<br>\n';
+		var nl = '\n';
+		var html = '<div class="ui_table_title"> <img id="'
+				+ this.div.getAttribute('id') + '_arrow" src="./images/'
+				+ context.jRow.UI.ARROW_COLLAPSE
+				+ '" style="vertical-align:middle;" > ' + this.table.title
+				+ '<img src="./images/jrow_title_ad.png" align="right"></div>'
+				+ nl + '<table id="' + this.div.getAttribute('id')
+				+ '_table" class="ui_table" collapsed="true">' + nl
+				+ '	{colgroup}' + nl + '	<thead>' + nl + '		{thead_content}'
+				+ nl + '	</thead>' + nl + '	<tbody>' + nl + '		{tbody_content}'
+				+ nl + '	</tbody>' + nl + '	<tfoot>' + nl
+				+ '		<tr><td colspan="' + this.table.cols
+				+ '">{tfoot_content}</td></tr>' + nl + '	</tfoot>' + nl
+				+ ' <div class="ui_context_menu">' + nl
+				+ ' <ul id="' + this.div.getAttribute('id')
+				+ '_context_menu"class="menu">'
+				+ '</ul></div>';
+
+		var colgroup = '';
+		var thead = '<tr>';
+		var tbody = '';
+		var tfoot = 'powered by jRow.js (c) 2013 ver. '+context.jRow.version;
+
 		// COLGROUP
-		for(var i = 0 ; i < this.table.cols ; i++){
-			var col = '<col id="'+this.table.title+'_col_'+i+'">' ;
+		for ( var i = 0; i < this.table.cols; i++) {
+			var col = '<col id="' + this.table.title + '_col_' + i + '">';
 			colgroup += col + nl;
 		}
 		// THEAD
-		for(var i in this.table.header){
-			thead += '<th>' + this.table.header[i] + '</th>' ;
+		for ( var i in this.table.header) {
+			thead += '<th>' + this.table.header[i] + '</th>';
 		}
-		thead += '</tr>' ;
-		
+		thead += '</tr>';
+
 		// TBODY
-		for(var n in this.table.collections){
-			var row = this.table.collections[n] ;
-			tbody += '<tr id="' + this.div.getAttribute('id') + '_table_row_' + n + '">' ;
-			for(var value in row){
-				if(value != '_id'){
-					tbody += '<td>' + row[value] + '</td>' ;
+		for ( var n in this.table.collections) {
+			var row = this.table.collections[n];
+			tbody += '<tr id="' + this.div.getAttribute('id') + '_table_row_'
+					+ n + '">';
+			for ( var value in row) {
+				if (value != '_id') {
+					tbody += '<td>' + row[value] + '</td>';
 				}
 			}
-			tbody += '</tr>' ;
+			tbody += '</tr>';
 		}
-		
-		html = html.replace('{colgroup}',colgroup);
-		html = html.replace('{thead_content}',thead);
-		html = html.replace('{tbody_content}',tbody);
-		html = html.replace('{tfoot_content}',tfoot);
-		
-		this.div.innerHTML = html ;
-		
-		var id = this.div.getAttribute('id') ;
-		var _this = this ;
-		
-		for(var n in this.table.collections){
-			var r = document.getElementById(id+'_table_row_'+n);
-			r.setAttribute('ID',n);
-			r.onclick = function(){
-				var id = this.getAttribute('ID') ;
-				var result = _this.table.getResult({_id:id});
-				_this.onRowClick(result[0]);
+
+		html = html.replace('{colgroup}', colgroup);
+		html = html.replace('{thead_content}', thead);
+		html = html.replace('{tbody_content}', tbody);
+		html = html.replace('{tfoot_content}', tfoot);
+
+		this.div.innerHTML = html;
+
+		var id = this.div.getAttribute('id');
+		var _this = this;
+
+		for ( var n in this.table.collections) {
+			var r = document.getElementById(id + '_table_row_' + n);
+			r.setAttribute('idRow', n);
+			r.oncontextmenu = function(e){
+				//console.log(e.pageX,e.pageY);
+				_this.clickCoordX = e.x ;
+				_this.clickCoordY = e.y ;
+				var id = this.getAttribute('idRow');
+				var result = _this.table.getResult({
+					_id : id
+				});
+				if(_this.enableContextMenu)_this.showContextMenu(_this.clickCoordX,_this.clickCoordY,result[0]);
+				return false ;
+			};
+			r.onclick = function(e) {
+				_this.clickCoordX = e.clientX || e.x ;
+				_this.clickCoordY = e.clientY || e.y ;
+				var id = this.getAttribute('idRow');
+				var result = _this.table.getResult({
+					_id : id
+				});
+				if(_this.onRowClick)_this.onRowClick(result[0]);
 			}
 		}
+
+		var arrow = document.getElementById(id + '_arrow');
+		var table = document.getElementById(id + '_table');
+		var contextMenu = document.getElementById(id + '_context_menu');
 		
-		var arrow = document.getElementById(id+'_arrow');
-		var table = document.getElementById(id+'_table');
-		arrow.onclick = function(){
+		arrow.onclick = function() {
 			var collapsed = table.getAttribute('collapsed');
-			if(collapsed){
-				this.src = './images/' + context.jRow.UI.ARROW_EXPAND ;
-				table.style.display = 'none' ;
-				table.setAttribute('collapsed','');
-				
-			}else{
-				this.src = './images/' + context.jRow.UI.ARROW_COLLAPSE ;
-				table.style.display = 'table' ;
-				table.setAttribute('collapsed','true');
+			if (collapsed) {
+				this.src = './images/' + context.jRow.UI.ARROW_EXPAND;
+				table.style.display = 'none';
+				contextMenu.style.display = 'none' ;
+				table.setAttribute('collapsed', '');
+
+			} else {
+				this.src = './images/' + context.jRow.UI.ARROW_COLLAPSE;
+				table.style.display = 'table';
+				table.setAttribute('collapsed', 'true');
 			}
 		}
 	}
-	
+
 })(JROW_CONTEXT);

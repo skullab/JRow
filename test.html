@@ -5,60 +5,31 @@
 <title>jRow - test</title>
 <script src="jRow.js"></script>
 <script>
-	console.log('current version :',jRow.version);
+	var myContacts = jRow.createTable('',['name','surname','phone']);
+	var myHobbies = jRow.createTable('',['hobby','stars']);
 	
-	var myTable = jRow.createTable('my personal contacts', [ 'name', 'surname',
-			'address' ]);
-	myTable.insert({
-		name : 'John',
-		surname : 'Smith',
-		address : 'avenue street'
-	}).insert({
-		name : 'John',
-		surname : 'Red',
-		address : 'park avenue'
-	}).insert({
-		name:'Paul',
-		surname:'John',
-		address:'celebrity street'
+	myContacts.insert({
+		name:'John',
+		surname:'Smith',
+		phone:'05647'
 	});
-
-	var result = myTable.getResult({
-		name : 'John',
-		surname : 'Smith'
+	
+	myHobbies.insert({
+		hobby:'videogames',
+		stars:5
 	});
-	for (n in result) {
-		var row = result[n];
-		console.log(row.address);
-	}
-
-	//myTable.update({name:'Jack',surname:'Black',address:'awesome street'},{_id:0});
-	console.log(myTable.getFirstRow({
-		name : 'John'
-	}).address);
-
 	
-	console.log(myTable.getResult());
+	jRow.UI.link('my_contacts',myContacts,{
+		
+	});
 	
-	
-	jRow.UI.link('myTable',myTable,{
-    col0:'25%',
-    col1:'25%',
-    col2:'50%',
-    width:'80%',
-    collapsed:true,
-    onRowClick:function(row){
-		  //myTable.update({name:'Mike'},{_id:row._id});
-      //myTable.erase({_id:row._id});
-      this.showContextMenu();
-		  jRow.UI.invalidate(myTable);
-	  }
-  });
+	jRow.UI.link('my_hobbies',myHobbies);
 	
 	jRow.UI.prepare();
 </script>
 </head>
 <body>
-	<div id="myTable"></div>
+	<div id="my_contacts"></div>
+	<div id="my_hobbies"></div>
 </body>
 </html>
