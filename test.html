@@ -5,25 +5,50 @@
 <title>jRow - test</title>
 <script src="jRow.js"></script>
 <script>
-	var myContacts = jRow.createTable('',['name','surname','phone']);
+	var myContacts = jRow.createTable('contacts',['name','surname','phone']);
 	var myHobbies = jRow.createTable('',['hobby','stars']);
-	
+  var myPets = jRow.createTable('',['name','race']);
+  
 	myContacts.insert({
+    phone:'05478',
 		name:'John',
-		surname:'Smith',
-		phone:'05647'
-	});
+		surname:'Smith'
+	}).insert({
+    name:'Paul',
+    surname:'Luap',
+    phone:'7845'
+  }).insert({
+    name:'Mikye',
+    surname:'Mouse',
+    phone:'0123'
+  });
 	
 	myHobbies.insert({
-		hobby:'videogames',
-		stars:5
-	});
+    foo:'ops',
+		stars:5,
+    foo2:'opssss',
+    hobby:'videogames'
+	}).insert({
+    hobby:'basket',
+    stars:3
+  });
 	
-	jRow.UI.link('my_contacts',myContacts,{
-		
-	});
-	
+  myHobbies.update({
+    other:false,
+    hobby:'soccer',
+    place:'stadium'
+  },{_id:0}).bound();
+  
+  myPets.insert({
+    name:'Fuffy',
+    race:'dog'
+  });
+  
+  var jT = jRow.join('my join table',myPets,myHobbies,myContacts);
+  
+	jRow.UI.link('my_contacts',myContacts);
 	jRow.UI.link('my_hobbies',myHobbies);
+  jRow.UI.link('join',jT);
 	
 	jRow.UI.prepare();
 </script>
@@ -31,5 +56,6 @@
 <body>
 	<div id="my_contacts"></div>
 	<div id="my_hobbies"></div>
+  <div id="join"></div>
 </body>
 </html>

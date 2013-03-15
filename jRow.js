@@ -2,7 +2,7 @@
  *	jRow.js Copyright (C) 2013 Ivan Maruca (ivan.maruca[at]gmail[dot]com)
  *	http://skullab.com
  *
- *	jRow.js is released under MIT LICENSE
+ *	jRow.js (C) is released under MIT LICENSE
  *
  *	Permission is hereby granted, free of charge, to any person obtaining a copy of this software 
  *	and associated documentation files (the "Software"), to deal in the Software without restriction, 
@@ -10,7 +10,8 @@
  *	and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, 
  *	subject to the following conditions:
  *
- *	The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *	The above copyright notice and this permission notice 
+ *	shall be included in all copies or substantial portions of the Software.
  *
  *	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
  *	INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
@@ -45,7 +46,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	// SOFTWARE VERSIONING
 	var VER_MAJOR = 0;
 	var VER_MINOR = 1;
-	var VER_REVISION = 3;
+	var VER_REVISION = 4;
 
 	var NOT_ASSIGNED = 'not_assigned';
 
@@ -66,6 +67,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 
 	context.jRow.createTable = createTable;
 	context.jRow.Table = Table;
+  context.jRow.join = join ;
 
 	// permission module
 	context.jRow.permission = {
@@ -109,23 +111,67 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		constructor : Table,
 		insert : function(row) {
 			this._id++;
-			this.collections[this._id] = new Collection(this._id, row);
+      var check = false ;
+      var rowCounter = 0 ;
+      for(var key in row){
+        rowCounter++ ;
+        for(var i in this.header){
+          if(key == this.header[i]){
+            check = true ;
+            break;
+          }
+          check = false ;
+        }
+        if(!check){
+          delete row[key] ;
+          rowCounter-- ;
+        }
+      }
+      check = (this.cols == rowCounter) ? true : false ;
+      //console.log(check,row,rowCounter);
+      if(check){
+        row = getOrderRow(row,this.header);
+        this.collections[this._id] = new Collection(this._id, row);
+        this.rows++;
+      }
 			return this;
 		},
 		update : function(newRow, where) {
+    
 			var result = this.getResult(where);
-			for (n in result) {
+      //var order = getOrderRow(newRow,this.header);
+      var safeHeader = this.header ;
+      
+			for (var n in result) {
 				var row = result[n];
-				for (key in newRow) {
-					if (row[key] != 'undefined')
+        var id = row._id ;
+        //console.log('result number',n,':',row);
+        var position = this.cols ;
+
+				for (var key in newRow) {
+					if(row[key]){
 						row[key] = newRow[key];
+            position = getPosition(row[key],row) ;
+          }else{
+            //console.log('add',key,position,this.cols);
+            if(!inArray(key,this.header)){
+              this.header.splice(position,0,key);
+              this.cols = this.header.length ;
+            }
+            row[key] = newRow[key]; 
+          }
 				}
-				this.collections[row._id] = row;
+        
+        row = getOrderRow(row,safeHeader);
+        //console.log('after update number',n,'result :',row);
+				this.collections[row._id] = new Collection(row._id,row);
+        //console.log(this.collections[row._id]);
 			}
+      return this ;
 		},
 		erase : function(where) {
 			var result = this.getResult(where);
-			for (n in result) {
+			for (var n in result) {
 				var row = result[n];
 				delete this.collections[row._id];
 			}
@@ -138,10 +184,10 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				result = this.collections;
 			}
 
-			for (n in this.collections) {
+			for (var n in this.collections) {
 				// console.log(this.collections[n]);
 				var collection = this.collections[n];
-				for (key in where) {
+				for (var key in where) {
 					if (collection[key] != 'undefined') {
 						if (collection[key] == where[key]) {
 							check = true;
@@ -160,13 +206,56 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		},
 		getFirstRow : function(where) {
 			return this.getResult(where)[0];
-		}
+		},
+    bound : function(value){
+      value = value || '' ;
+      for(var n in this.collections){
+          var row = this.collections[n] ;
+          for(var i in this.header){
+            var key = this.header[i] ;
+            row[key] = (typeof row[key] != 'undefined') ? row[key] : value ;
+          }
+          row = getOrderRow(row,this.header);
+          this.collections[n] = new Collection(row._id,row) ;
+          //console.log(this.collections[n]);
+      }
+    }
 	}
-
+  
+  function getPosition(value,obj){
+    var n = 0 ;
+    for(var key in obj){
+      if(value === obj[key]){
+        return n ;
+      }else n++ ;
+    }
+    return -1 ;
+  }
+  
+  function inArray(value,arr){
+    for(var i = 0 ; i < arr.length ; i++){
+      if(value === arr[i]){
+        return true ;
+      }
+    }
+    return false ;
+  }
+  
+  function getOrderRow(row,header){
+    var orderRow = {} ;
+    if(row._id >= 0)orderRow._id = row._id ;
+    for(var i in header){
+      var key = header[i] ;
+      if(row[key] != 'undefined'){
+        orderRow[key] = row[key] ;
+      }
+    }
+    return orderRow ;
+  }
 	// Collection data (single row)
 	function Collection(id, row) {
 		this._id = id;
-		for (key in row) {
+		for (var key in row) {
 			this[key] = row[key];
 		}
 	}
@@ -178,6 +267,62 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		return new Table(title, header);
 	}
 
+  /** Join tables and return a new table !
+   *  Table join('Title',table1,table2,...,tableX, optional [col1,col2...])
+   **/   
+  function join(){
+    var title = [].shift.call(arguments);
+    if(typeof title != 'string')throw new Error('jRow Join error : Title is not set !');
+    var header = isArray(arguments[arguments.length-1]) ? [].pop.call(arguments) : [] ;
+    var concatHeader = (header.length == 0) ? true : false ;
+    var max = 0 ;
+    console.log(header,arguments);
+    for(var i = 0 ; i < arguments.length ; i++){
+      var table = arguments[i] ;
+      if(table instanceof context.jRow.Table){
+        var _title = (table.title == '' || table.title == null) ? i : table.title ;
+        if(concatHeader)header = header.concat(headerTableName(_title,table.header));
+        max = Math.max(max,table.rows); 
+      }
+    }
+    console.log(header,max);
+    var joinTable = createTable(title,header);
+    var joinCollections = {} ;
+    var joinContainer = [] ;
+    console.log(joinTable);
+    for(var i = 0 ; i < arguments.length ; i++){
+      var table = arguments[i] ;
+      var rerow = {} ;
+      if(table instanceof context.jRow.Table){
+        for(var n = 0 ; n < max ; n++){
+          var row = table.getFirstRow({_id:n});
+          if(row == undefined)row = new Collection(n,{});
+          for(var x = 0 ; x < header.length ; x++){
+            var value = row[header[x].split('.')[1]] ;
+            console.log(value);
+            rerow[header[x]] = value ? value : '';
+          }
+          joinTable.insert(rerow);
+        }
+        
+      }
+    }
+    console.log(joinTable);
+    return joinTable ;
+  }
+  
+  function headerTableName(title,header){
+    var titleHeader = [] ;
+    for(var i in header){
+      titleHeader[i] = title + '.' + header[i] ;
+    }  
+    return titleHeader ;
+  }
+  
+  function verifyArray(obj){
+    return (isArray(obj) ? {verify:true,object:obj} : {verify:false,object:obj});
+  }
+  
 	function isArray(obj) {
 		return obj.constructor == Array;
 	}
@@ -440,13 +585,21 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		// TBODY
 		for ( var n in this.table.collections) {
 			var row = this.table.collections[n];
+      var counter = 0 ;
+      //console.log('UI',row);
 			tbody += '<tr id="' + this.div.getAttribute('id') + '_table_row_'
 					+ n + '">';
 			for ( var value in row) {
 				if (value != '_id') {
+          counter++;
 					tbody += '<td>' + row[value] + '</td>';
 				}
 			}
+      var span = this.table.cols - counter ;
+      //console.log('span ?',this.table.cols,span);
+      for(var i = 0 ; i < span ; i++){
+        tbody += '<td></td>' ;
+      } 
 			tbody += '</tr>';
 		}
 
