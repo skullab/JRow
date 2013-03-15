@@ -93,6 +93,18 @@ table.ui_table td {
 	padding: 0.5em;
 }
 
+table.ui_table tr {
+	border-bottom : 1px solid #c1d7e5 ;
+}
+
+table.ui_table tfoot tr:last-child {
+	border-bottom : 0 ;
+}
+
+table.ui_table thead tr:last-child {
+	border-bottom : 0 ;
+}
+
 /*** table's tfoot section ***/
 table.ui_table tfoot {
 	text-align: center;

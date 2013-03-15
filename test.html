@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>jRow - test</title>
-<script src="jRow.js"></script>
+<script src="js/jRow/jRow.js"></script>
 <script>
 	var myContacts = jRow.createTable('contacts',['name','surname','phone']);
-	var myHobbies = jRow.createTable('',['hobby','stars']);
-  var myPets = jRow.createTable('',['name','race']);
+	var myHobbies = jRow.createTable('hobbies',['hobby','stars']);
+  var myPets = jRow.createTable('pets',['name','race']);
   
 	myContacts.insert({
     phone:'05478',
@@ -44,18 +44,51 @@
     race:'dog'
   });
   
-  var jT = jRow.join('my join table',myPets,myHobbies,myContacts);
-  
-	jRow.UI.link('my_contacts',myContacts);
-	jRow.UI.link('my_hobbies',myHobbies);
-  jRow.UI.link('join',jT);
+  myHobbies.insert({
+		hobby:'running',
+		stars:4,
+		other:'bj',
+		place:'anywhere'
+	});
 	
+  	var jT = jRow.join('my join table',myPets,myHobbies,myContacts,['pets.name','contacts.name','hobbies.hobby']);
+  
+  	var jC = jRow.join('my other join table',myContacts,['contacts.name','contacts.phone']);
+  	
+  	jRow.UI.link('my_pets',myPets,{width:'33%',height:'200px',enableContextMenu:true});
+	jRow.UI.link('my_contacts',myContacts,{width:'33%',height:'200px',enableContextMenu:true});
+	jRow.UI.link('my_hobbies',myHobbies,{width:'33%',height:'200px',enableContextMenu:true});
+  	jRow.UI.link('join',jT,{
+  		width:'99%',
+  		alternateHeader:['name of pet','name of person','hobby of person'],
+  		enableContextMenu:true,
+  		onPrepareContextMenu:function(){
+  			return {copy:'Copy',erase:'Erase'}
+  		},
+  		onContextMenuItem:function(item,row){
+  			console.log(item,row);
+  		}
+  	});
+  	
+  	jRow.UI.link('join_contacts',jC);
+  	
+  	jT.insert({
+  		'pets.name':'flash',
+  		'contacts.name':'Kyle',
+  		'hobbies.hobby':'Kayak'
+  	})
+  	//jRow.UI.postInvalidate(myContacts) ;
+  	
 	jRow.UI.prepare();
 </script>
 </head>
 <body>
-	<div id="my_contacts"></div>
-	<div id="my_hobbies"></div>
-  <div id="join"></div>
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<div id="my_pets" style="float:left;"></div>
+	<div id="my_contacts" style="float:left;"></div> 
+	<div id="my_hobbies" style="float:left;"></div>
+	
+  	<div id="join" style="clear:left;"></div>
+  	<div id="join_contacts"></div>
 </body>
 </html>
