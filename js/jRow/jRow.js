@@ -46,7 +46,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	// SOFTWARE VERSIONING
 	var VER_MAJOR = 0;
 	var VER_MINOR = 2;
-	var VER_REVISION = 3;
+	var VER_REVISION = 4;
 	var JROW_FILENAME = 'jRow.js' ;
 	var NOT_ASSIGNED = 'not_assigned';
 
@@ -753,7 +753,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				table.setAttribute('collapsed', '');
 
 			} else {
-				this.src = ontext.jRow.root + '/images/' + context.jRow.UI.ARROW_COLLAPSE;
+				this.src = context.jRow.root + '/images/' + context.jRow.UI.ARROW_COLLAPSE;
 				table.style.display = 'table';
 				table.setAttribute('collapsed', 'true');
 			}
