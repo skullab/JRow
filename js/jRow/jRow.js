@@ -37,24 +37,24 @@ if (typeof JROW_CONTEXT === 'undefined') {
 };
 (function(context) {
 	/*
-	 * +----------------------------------------------------------------------------+ 
-	 * |CONSTANTS																	|
-	 * +----------------------------------------------------------------------------+ 
-	 * |ACCESSIBILITY : PRIVATE 													|
+	 * +----------------------------------------------------------------------------+
+	 * |CONSTANTS |
+	 * +----------------------------------------------------------------------------+
+	 * |ACCESSIBILITY : PRIVATE |
 	 * +----------------------------------------------------------------------------+
 	 */
 	// SOFTWARE VERSIONING
 	var VER_MAJOR = 0;
 	var VER_MINOR = 2;
-	var VER_REVISION = 4;
-	var JROW_FILENAME = 'jRow.js' ;
+	var VER_REVISION = 5;
+	var JROW_FILENAME = 'jRow.js';
 	var NOT_ASSIGNED = 'not_assigned';
 
 	/*
-	 * +----------------------------------------------------------------------------+ 
-	 * |JROW MODULE																	|
-	 * +----------------------------------------------------------------------------+ 
-	 * |ACCESSIBILITY : PUBLIC 														|
+	 * +----------------------------------------------------------------------------+
+	 * |JROW MODULE |
+	 * +----------------------------------------------------------------------------+
+	 * |ACCESSIBILITY : PUBLIC |
 	 * +----------------------------------------------------------------------------+
 	 */
 
@@ -62,19 +62,19 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		// current version of this software [major.minor.revision]
 		version : VER_MAJOR + '.' + VER_MINOR + '.' + VER_REVISION,
 		// the root where it is installed
-		root : (function(){
+		root : (function() {
 			var scripts = document.getElementsByTagName('script');
-			for(var i = 0 ; i < scripts.length ; i++){
-				var script = scripts[i] ;
+			for ( var i = 0; i < scripts.length; i++) {
+				var script = scripts[i];
 				var path = script.src.split('/');
-				var file = path[path.length-1];
-				if(file == JROW_FILENAME){
+				var file = path[path.length - 1];
+				if (file == JROW_FILENAME) {
 					path.pop();
 					path = path.join('/');
-					return path ;
+					return path;
 				}
 			}
-			return '' ;
+			return '';
 		})()
 	}
 
@@ -83,7 +83,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	context.jRow.join = join;
 
 	// permission module
-	context.jRow.permission = {
+	context.jRow.permissions = {
 		editable : NOT_ASSIGNED,
 		deletable : NOT_ASSIGNED,
 		sortable : NOT_ASSIGNED,
@@ -94,9 +94,9 @@ if (typeof JROW_CONTEXT === 'undefined') {
 
 	/*
 	 * +----------------------------------------------------------------------------+
-	 * |CORE																		|
-	 * +----------------------------------------------------------------------------+ 
-	 * |ACCESSIBILITY : PRIVATE														|
+	 * |CORE |
+	 * +----------------------------------------------------------------------------+
+	 * |ACCESSIBILITY : PRIVATE |
 	 * +----------------------------------------------------------------------------+
 	 */
 
@@ -105,9 +105,13 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		if (!isArray(header))
 			throw new Error('ERROR : header is not a valid Array !');
 
+		this.permissions = {};
+		for ( var permission in context.jRow.permissions) {
+			this.permissions[permission] = context.jRow.permissions[permission];
+		}
+		;
 		this.title = title;
 		this.header = header;
-		this.permission = context.jRow.permission;
 		this.cols = header.length;
 		this.rows = 0;
 		this._id = -1;
@@ -123,6 +127,8 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	Table.prototype = {
 		constructor : Table,
 		insert : function(row) {
+			if (this.permissions.editable == false)
+				return;
 			this._id++;
 			var check = false;
 			var rowCounter = 0;
@@ -146,15 +152,20 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				row = getOrderRow(row, this.header);
 				this.collections[this._id] = new Collection(this._id, row);
 				this.rows++;
-			}else{
-				return {error:true,insert:function(){
-					throw new Error('jRow Exception : Previous insert is not successful !');
-				}};
+			} else {
+				return {
+					error : true,
+					insert : function() {
+						throw new Error(
+								'jRow Exception : Previous insert is not successful !');
+					}
+				};
 			}
 			return this;
 		},
 		update : function(newRow, where) {
-
+			if (this.permissions.editable == false)
+				return;
 			var result = this.getResult(where);
 			// var order = getOrderRow(newRow,this.header);
 			var safeHeader = this.header;
@@ -184,10 +195,12 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				this.collections[row._id] = new Collection(row._id, row);
 				// console.log(this.collections[row._id]);
 			}
-			
+
 			return this;
 		},
 		erase : function(where) {
+			if (this.permissions.deletable == false)
+				return;
 			var result = this.getResult(where);
 			for ( var n in result) {
 				var row = result[n];
@@ -300,7 +313,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				.call(arguments) : [];
 		var concatHeader = (header.length == 0) ? true : false;
 		var max = 0;
-		//console.log(header, arguments);
+		// console.log(header, arguments);
 		for ( var i = 0; i < arguments.length; i++) {
 			var table = arguments[i];
 			if (table instanceof context.jRow.Table) {
@@ -312,7 +325,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				max = Math.max(max, table.rows);
 			}
 		}
-		//console.log(header, max);
+		// console.log(header, max);
 		var joinTable = createTable(title, header);
 
 		for ( var i = 0; i < max; i++) {
@@ -323,7 +336,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				var r = table.getFirstRow({
 					_id : i
 				});
-				//console.log(r);
+				// console.log(r);
 				for ( var h in header) {
 					var key = header[h];
 					var sKey = key.split('.')[1];
@@ -335,14 +348,14 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				}
 			}
 			var c = new Collection(i, rr);
-			//console.log(i, rr, c);
+			// console.log(i, rr, c);
 			joinTable.collections[i] = c;
 			joinTable.bound();
 		}
 
-		joinTable._id = max - 1 ;
-		joinTable.rows = max ;
-		//console.log(joinTable);
+		joinTable._id = max - 1;
+		joinTable.rows = max;
+		// console.log(joinTable);
 		return joinTable;
 	}
 
@@ -371,17 +384,18 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	}
 
 	/*
-	 * +----------------------------------------------------------------------------+ 
-	 * |USER INTERFACE 																|
-	 * +----------------------------------------------------------------------------+ 
-	 * |ACCESSIBILITY : PUBLIC 														|
+	 * +----------------------------------------------------------------------------+
+	 * |USER INTERFACE |
+	 * +----------------------------------------------------------------------------+
+	 * |ACCESSIBILITY : PUBLIC |
 	 * +----------------------------------------------------------------------------+
 	 */
 	context.jRow.UI = {
 		link : link,
 		prepare : prepare,
 		invalidate : invalidate,
-		postInvalidate : postInvalidate
+		postInvalidate : postInvalidate,
+		update : update
 	}
 
 	context.jRow.UI.links = {};
@@ -397,10 +411,10 @@ if (typeof JROW_CONTEXT === 'undefined') {
 	context.jRow.UI.ARROW_EXPAND = 'arrow_expand.png';
 
 	/*
-	 * +----------------------------------------------------------------------------+ 
-	 * |USER INTERFACE CORE 														|
-	 * +----------------------------------------------------------------------------+ 
-	 * |ACCESSIBILITY : PRIVATE 													|
+	 * +----------------------------------------------------------------------------+
+	 * |USER INTERFACE CORE |
+	 * +----------------------------------------------------------------------------+
+	 * |ACCESSIBILITY : PRIVATE |
 	 * +----------------------------------------------------------------------------+
 	 */
 	var WINDOW_LOADED = false;
@@ -410,7 +424,8 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		var css = document.createElement('link');
 		css.rel = 'stylesheet';
 		css.type = 'text/css';
-		css.href = context.jRow.root +'/css/' + context.jRow.UI.CSS_FILENAME + '.css';
+		css.href = context.jRow.root + '/css/' + context.jRow.UI.CSS_FILENAME
+				+ '.css';
 		css.title = context.jRow.UI.CSS_TITLE;
 
 		document.getElementsByTagName('head')[0].appendChild(css);
@@ -458,6 +473,17 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		return (context.jRow.UI.tables[table.title] != undefined);
 	}
 
+	function update(reference) {
+		if (reference instanceof context.jRow.Table) {
+			if (reference != undefined && !isLinked(reference)) {
+				console.log(reference);
+				throw new Error('jRow Excecption : Table ' + reference.title
+						+ ' is not linked !');
+			}
+			context.jRow.UI.tables[reference.title].draw();
+		}
+	}
+
 	function invalidate(reference) {
 		// console.log('It\'s time to create UI !');
 
@@ -496,6 +522,7 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		var id = this.div.getAttribute('id');
 		var settings = context.jRow.UI.layouts[id];
 		var tableElement = document.getElementById(id + '_table');
+		var todo = Array();
 
 		if (!settings)
 			return;
@@ -517,8 +544,8 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				break;
 			case 'height':
 				var id = this.div.getAttribute('id');
-				var tableElement = document.getElementById(id+'_table');
-				tableElement.style.height = settings[option] ;
+				var tableElement = document.getElementById(id + '_table');
+				tableElement.style.height = settings[option];
 				// this.div.style.height = settings[option];
 				break;
 			case 'onRowClick':
@@ -540,20 +567,41 @@ if (typeof JROW_CONTEXT === 'undefined') {
 				}
 				break;
 			case 'collapsed':
-				if (!settings[option]) {
-					var arrow = document.getElementById(this.div
-							.getAttribute('id')
-							+ '_arrow');
-					arrow.onclick();
+				if (typeof settings[option] == 'boolean') {
+					if (!settings[option]) {
+						var arrow = document.getElementById(this.div
+								.getAttribute('id')
+								+ '_arrow');
+						arrow.onclick();
+					}
 				}
 				break;
-			case 'alternateHeader':
+			case 'alternativeHeader':
 				if (isArray(settings[option])) {
 					this.alternateHeader = settings[option];
 					reDraw(this.table);
 				}
 				break;
+			case 'titleAd':
+				var titleAd = document.getElementById(this.div
+						.getAttribute('id')
+						+ '_jrow_title_ad');
+				titleAd.setAttribute('src', context.jRow.root + '/images/'
+						+ settings[option]);
+				break;
+			case 'showTitleAd':
+				if (!settings[option]) {
+					var titleAd = document.getElementById(this.div
+							.getAttribute('id')
+							+ '_jrow_title_ad');
+					titleAd.style.visibility = "hidden";
+				}
+				break;
 			}
+		}
+
+		for ( var operation in todo) {
+			todo[operation]();
 		}
 	}
 
@@ -648,11 +696,14 @@ if (typeof JROW_CONTEXT === 'undefined') {
 		var br = '<br>\n';
 		var nl = '\n';
 		var html = '<div class="ui_table_title"> <img id="'
-				+ this.div.getAttribute('id') + '_arrow" src="'+ context.jRow.root +'/images/'
+				+ this.div.getAttribute('id') + '_arrow" src="'
+				+ context.jRow.root + '/images/'
 				+ context.jRow.UI.ARROW_COLLAPSE
 				+ '" style="vertical-align:middle;" > ' + this.table.title
-				+ '<img src="'+ context.jRow.root +'/images/jrow_title_ad.png" align="right"></div>'
-				+ nl + '<table id="' + this.div.getAttribute('id')
+				+ '<img id="' + this.div.getAttribute('id')
+				+ '_jrow_title_ad" src="' + context.jRow.root
+				+ '/images/jrow_title_ad.png" align="right"></div>' + nl
+				+ '<table id="' + this.div.getAttribute('id')
 				+ '_table" class="ui_table" collapsed="true">' + nl
 				+ '	{colgroup}' + nl + '	<thead>' + nl + '		{thead_content}'
 				+ nl + '	</thead>' + nl + '	<tbody>' + nl + '		{tbody_content}'
@@ -746,16 +797,23 @@ if (typeof JROW_CONTEXT === 'undefined') {
 
 		arrow.onclick = function() {
 			var collapsed = table.getAttribute('collapsed');
-			if (collapsed) {
-				this.src = context.jRow.root + '/images/' + context.jRow.UI.ARROW_EXPAND;
-				table.style.display = 'none';
-				contextMenu.style.display = 'none';
-				table.setAttribute('collapsed', '');
-
+			if (_this.table.permissions.collapsable != false) {
+				if (collapsed) {
+					this.src = context.jRow.root + '/images/'
+							+ context.jRow.UI.ARROW_EXPAND;
+					table.style.display = 'none';
+					contextMenu.style.display = 'none';
+					table.setAttribute('collapsed', '');
+				} else {
+					this.src = context.jRow.root + '/images/'
+							+ context.jRow.UI.ARROW_COLLAPSE;
+					table.style.display = 'table';
+					table.setAttribute('collapsed', 'true');
+				}
 			} else {
-				this.src = context.jRow.root + '/images/' + context.jRow.UI.ARROW_COLLAPSE;
-				table.style.display = 'table';
-				table.setAttribute('collapsed', 'true');
+				console
+						.log('jRow Permission denied : Permission "collapsable" for Table '
+								+ _this.table.title + ' is denied !');
 			}
 		}
 	}

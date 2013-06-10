@@ -7,8 +7,8 @@
 <script>
 	var myContacts = jRow.createTable('contacts',['name','surname','phone']);
 	var myHobbies = jRow.createTable('hobbies',['hobby','stars']);
-  var myPets = jRow.createTable('pets',['name','race']);
-  
+  	var myPets = jRow.createTable('pets',['name','race']);
+   
 	myContacts.insert({
     phone:'05478',
 		name:'John',
@@ -55,22 +55,39 @@
   
   	var jC = jRow.join('my other join table',myContacts,['contacts.name','contacts.phone']);
   	
-  	jRow.UI.link('my_pets',myPets,{width:'33%',height:'200px',enableContextMenu:true});
-	jRow.UI.link('my_contacts',myContacts,{width:'33%',height:'200px',enableContextMenu:true});
-	jRow.UI.link('my_hobbies',myHobbies,{width:'33%',height:'200px',enableContextMenu:true});
+  	
+  	jC.permissions.collapsable = false ;
+  	
+  	
+  	jRow.UI.link('my_pets',myPets,{collapsed:false,width:'33%',height:'200px',enableContextMenu:true});
+	jRow.UI.link('my_contacts',myContacts,{collapsed:false,width:'33%',height:'200px',enableContextMenu:true});
+	jRow.UI.link('my_hobbies',myHobbies,{collapsed:false,width:'33%',height:'200px',enableContextMenu:true});
   	jRow.UI.link('join',jT,{
   		width:'99%',
-  		alternateHeader:['name of pet','name of person','hobby of person'],
+  		alternativeHeader:['name of pet','name of person','hobby of person'],
+  		collapsed:false, // you must declare collasped option after alternativeHeader !!!
   		enableContextMenu:true,
   		onPrepareContextMenu:function(){
   			return {copy:'Copy',erase:'Erase'}
   		},
   		onContextMenuItem:function(item,row){
   			console.log(item,row);
-  		}
+  			if(item == 'erase'){
+  				row['pets.name'] = 'UAAAAA' ;
+  	  			console.log(jT.getResult());
+  	  			jRow.UI.update(jT);
+  			}
+  			
+  		},
+  		showTitleAd:false,
+  		
   	});
   	
-  	jRow.UI.link('join_contacts',jC);
+  	jRow.UI.link('join_contacts',jC,{
+  		collapsed:true,
+  		width:'99%',
+  		titleAd:'jrow_title_ad_alternative.png'
+  	});
   	
   	jT.insert({
   		'pets.name':'flash',
@@ -83,12 +100,12 @@
 </script>
 </head>
 <body>
-	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 	<div id="my_pets" style="float:left;"></div>
 	<div id="my_contacts" style="float:left;"></div> 
 	<div id="my_hobbies" style="float:left;"></div>
 	
   	<div id="join" style="clear:left;"></div>
+  	<h4>This table have permission.collapsable set to false !</h4>
   	<div id="join_contacts"></div>
 </body>
 </html>
