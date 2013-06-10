@@ -56,6 +56,6 @@ When you have created all your tables...let's show them !
 jRow.UI.prepare();
 ```
 
-### Enjoyed the result !
+### Enjoy the result !
 
 ![table example](http://i43.tinypic.com/2vazjo1.png)
